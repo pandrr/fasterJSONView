@@ -105,7 +105,7 @@ function summary(str)
 
 function warning(str)
 {
-    return '<span class="warning"> <-- '+str+'</span>'
+    return '<span class="warning">'+str+'</span>'
     
 }
 
@@ -173,7 +173,6 @@ function parseChild(data,str,level)
                     else for(var di=0;di<data[i].length;di++) arrStr+=data[i][di]+',';
                 
                 arrStr=arrStr.slice(0,-1);
-
                 strAdd+='['+value(arrStr)+']';
             }
             else
@@ -194,7 +193,7 @@ function parseChild(data,str,level)
 
             if(contents==OBJ && data[i].length>30)
             {
-                strAdd+=oneLevel+indent+warning(data[i].length+' '+contents+'s NOT SHOWN')+newLine;
+                strAdd+=oneLevel+indent+warning('['+data[i].length+' '+contents+'s NOT SHOWN]')+newLine;
             }
             else
             {
@@ -218,9 +217,9 @@ function parseChild(data,str,level)
 
 request(
     {
-        // url:'skull.fbx.3d.json',
+        url:'skull.fbx.3d.json',
         // url:'cbllatest.json',
-        url:'cblrandom.json',
+        // url:'cblrandom.json',
         
         cb:function(err,_data)
         {
