@@ -105,10 +105,16 @@ function summary(str)
 
 function warning(str)
 {
-    return '<span class="warning"> (( '+str+'))</span>'
+    return '<span class="warning"> <-- '+str+'</span>'
     
 }
 
+
+const STR='string';
+const NUM='number';
+const OBJ='object';
+const MIXED='mixed';
+const BOOL='boolean';
 
 
 function parseChild(data,str,level)
@@ -134,52 +140,59 @@ function parseChild(data,str,level)
 
         if(!rootIsArray) strAdd+=indent+title(i)+':&nbsp;';
 
-        if(type=='number') strAdd+=value(data[i])+',';
-            else if(type=='string') strAdd+=value(stringSummary(data[i]))+',';
-            else if(type=='boolean') strAdd+=value(data[i])+',';
+        if(type==NUM) strAdd+=value(data[i])+',';
+            else if(type==STR) strAdd+=value(stringSummary(data[i]))+',';
+            else if(type==BOOL) strAdd+=value(data[i])+',';
 
         var contents='';
         var isArray=Array.isArray(data[i]);
 
+
         if(isArray)
         {
+            if(data[i].length==0)
+            {
+                strAdd+=value('[]')+','+newLine;
+                continue;
+            }
             contents=typeof data[i][0];
             for(var ai=0;ai<data[i].length;ai++)
             {
                 if(typeof(data[i][ai])!=contents)
                 {
-                    contents='mixed';
+                    contents=MIXED;
                     break;
                 }
             }
 
-            if( (contents=="number" || contents=="string") && data[i].length<=8)
+            if( (contents==NUM || contents==BOOL || contents==STR) && data[i].length<=8)
             {
                 var arrStr='';
-                arrStr+='[';
-                for(var di=0;di<data[i].length;di++) arrStr+=data[i][di]+',';
-                arrStr=arrStr.slice(0,-1);
-                arrStr+=']';
 
-                strAdd+=value(arrStr);
+                if(contents==STR) for(var di=0;di<data[i].length;di++) arrStr+='"'+data[i][di]+'",';
+                    else for(var di=0;di<data[i].length;di++) arrStr+=data[i][di]+',';
+                
+                arrStr=arrStr.slice(0,-1);
+
+                strAdd+='['+value(arrStr)+']';
             }
             else
-            if(contents!="mixed" && contents!="object")
+            if(contents!=MIXED && contents!=OBJ)
             {
                 if(rootIsArray)strAdd+=indent;
                 strAdd+=summary('[array of '+data[i].length+' '+contents+'s]')+',';
             }
         }
 
-        if(type=='object' && rootIsArray && count==0) strAdd+='';
+        if(type==OBJ && rootIsArray && count==0) strAdd+='';
             else strAdd+=newLine;
 
-        if(type=='object' && (contents=='mixed' || contents=='' || contents=='object'))
+        if(type==OBJ && (contents==MIXED || contents=='' || contents==OBJ))
         {
             if(isArray)strAdd+=indent+'['+newLine;
                 else strAdd+=indent+'{'+newLine;
 
-            if(contents=='object' && data[i].length>30)
+            if(contents==OBJ && data[i].length>30)
             {
                 strAdd+=oneLevel+indent+warning(data[i].length+' '+contents+'s NOT SHOWN')+newLine;
             }
