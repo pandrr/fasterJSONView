@@ -1,4 +1,4 @@
-# nicerJSON
+# fasterJSONView
 displays json files in a readable format
 
 - big arrays are summarized: only type of content and number of items are shown 
