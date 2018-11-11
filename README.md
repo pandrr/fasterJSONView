@@ -1,30 +1,18 @@
 # nicerJSON
 displays json files in a readable format
 
-will become a browser extension.
+- big arrays are summarized: only type of content and number of items are shown 
+- it can handle huge json files, e.g. 10mb or greater
+- syntax highlighting is not 100% perfect, but fast
 
-displays a summarized json file, can display megabyte sized json files
-
-
+example output:
 ```
-rootnode: 
-{
-    name: "43_ChinUpperRaise.obj",
-    transformation: [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
-    children: 
-    [
-        {
-            name: "defaultobject",
-            transformation: [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
-            meshes: [0]
-        }
-    ]
-},
-flags: 8,
 meshes: 
 [
     {
-        name: "",
+        name: "defaultobject",
+        transformation: [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
+        meshes: [0]
         materialindex: 0,
         primitivetypes: 4,
         vertices: [array of 27105 numbers],
