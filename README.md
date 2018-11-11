@@ -26,7 +26,7 @@ meshes:
         ],
         faces: 
         [
-            [14600 object NOT SHOWN]
+            [14600 objects NOT SHOWN]
         ]
     }
 ]
