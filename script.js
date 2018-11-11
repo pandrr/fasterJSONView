@@ -143,7 +143,7 @@ function parseChild(data,str,level)
             {
                 var contentStr=contents+'s';
                 if(contents==MIXED)contentStr='mixed content';
-                strAdd+=oneLevel+indent+warning('['+data[i].length+' '+contents+' NOT SHOWN]')+newLine;
+                strAdd+=oneLevel+indent+warning('['+data[i].length+' '+contents+'s NOT SHOWN]')+newLine;
             }
             else
             {

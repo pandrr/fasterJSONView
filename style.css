@@ -22,5 +22,5 @@ body.nicerJSON
 .nicerJSON .summary
 {
 	color:#ec9213;
-	user-select: none;
+	/*user-select: none;*/
 }
