@@ -176,7 +176,7 @@ function parse(data)
 
     var ele=document.createElement("div");
     document.body.appendChild(ele);
-    document.body.classList.add('nicerJSON');
+    document.body.classList.add('fasterJSON');
 
     ele.innerHTML=str;
     console.log("done!");
