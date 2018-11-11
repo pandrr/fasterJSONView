@@ -1,55 +1,5 @@
 "use strict";
-    // CABLES.request(
-    //     {
-    //         "url":url,
-    //         "cb":cb,
-    //         "method":method,
-    //         "data:":post,
-    //         "contenttype":contenttype,
-    //         "sync":false,
-    //         "jsonp":jsonp
-    //     });
 
-function request(options)
-{
-    if(!options.hasOwnProperty('asynch'))options.asynch=true;
-
-    var xhr;
-    try{ xhr = new XMLHttpRequest(); }catch(e){}
-
-    xhr.onreadystatechange = function()
-    {
-        if (xhr.readyState != 4) return;
-
-        if(options.cb)
-        {
-            if(xhr.status == 200 || xhr.status == 0) options.cb(false, xhr.responseText,xhr);
-            else options.cb(true, xhr.responseText,xhr);
-        }
-    };
-
-    xhr.addEventListener("progress", function(ev)
-    {
-        // console.log('progress',ev.loaded/1024+' kb');
-        // if (ev.lengthComputable)
-        // {
-        //     var percentComplete = ev.loaded / ev.total;
-        //     console.log(url,percentComplete);
-        // }
-    });
-
-    xhr.open(options.method?options.method.toUpperCase():"GET", options.url, !options.sync);
-
-    if(!options.post && !options.data)
-    {
-        xhr.send();
-    }
-    else
-    {
-        xhr.setRequestHeader('Content-type', options.contenttype?options.contenttype:'application/x-www-form-urlencoded');
-        xhr.send(options.data||options.post);
-    }
-};
 
 function escapeHtml(unsafe) {
     return unsafe
@@ -67,7 +17,6 @@ function stringSummary(str)
 {
     var meta='';
     var summary=escapeHtml(str);
-    // summary=replaceAll(summary,'\\n','');
     summary = summary.replace(/(\r\n|\n|\r)/gm," ");
 
     if(str.indexOf('\n')!=-1)meta+='multiline String ';
@@ -165,7 +114,7 @@ function parseChild(data,str,level)
                 }
             }
 
-            if( (contents==NUM || contents==BOOL || contents==STR) && data[i].length<=8)
+            if( (contents==NUM || contents==BOOL || contents==STR) && data[i].length<=16)
             {
                 var arrStr='';
 
@@ -175,8 +124,7 @@ function parseChild(data,str,level)
                 arrStr=arrStr.slice(0,-1);
                 strAdd+='['+value(arrStr)+']';
             }
-            else
-            if(contents!=MIXED && contents!=OBJ)
+            else if( contents!=OBJ)
             {
                 if(rootIsArray)strAdd+=indent;
                 strAdd+=summary('[array of '+data[i].length+' '+contents+'s]')+',';
@@ -186,14 +134,16 @@ function parseChild(data,str,level)
         if(type==OBJ && rootIsArray && count==0) strAdd+='';
             else strAdd+=newLine;
 
-        if(type==OBJ && (contents==MIXED || contents=='' || contents==OBJ))
+        if(type==OBJ && (contents=='' || contents==OBJ))
         {
             if(isArray)strAdd+=indent+'['+newLine;
                 else strAdd+=indent+'{'+newLine;
 
-            if(contents==OBJ && data[i].length>30)
+            if(contents==OBJ && data[i].length>200)
             {
-                strAdd+=oneLevel+indent+warning('['+data[i].length+' '+contents+'s NOT SHOWN]')+newLine;
+                var contentStr=contents+'s';
+                if(contents==MIXED)contentStr='mixed content';
+                strAdd+=oneLevel+indent+warning('['+data[i].length+' '+contents+' NOT SHOWN]')+newLine;
             }
             else
             {
@@ -201,7 +151,7 @@ function parseChild(data,str,level)
             }
             if(isArray)strAdd+=indent+']';
                 else strAdd+=''+indent+'}';
-            
+
             strAdd+=',';
             lastWasMultiLine=true;
         }
@@ -215,46 +165,64 @@ function parseChild(data,str,level)
     return str+'';
 }
 
-request(
+function parse(data)
+{
+    console.log('loaded');
+    var str='';
+
+    str+=parseChild(data,str,0);
+
+
+
+    var ele=document.createElement("div");
+    document.body.appendChild(ele);
+    document.body.classList.add('nicerJSON');
+
+    ele.innerHTML=str;
+    console.log("done!");
+}
+
+
+
+function start()
+{
+    try
     {
-        url:'skull.fbx.3d.json',
-        // url:'cbllatest.json',
-        // url:'cblrandom.json',
-        
-        cb:function(err,_data)
-        {
-            var parseError=false;
-            var data={};
-            try{
-                data=JSON.parse(_data);
-            }catch(e)
-            {
-                parseError=true;
-                str='parse error! '+e.message;
-                console.log(e);
-                console.log(_data);
-            }
+        var rawString=document.body.innerText;
+        var data=JSON.parse(rawString);
+        document.body.innerText='';
 
-            if(err)
-            {
-                str='could not load file!';
-            }
-            
-            if(!err && !parseError)
-            {
-                console.log('loaded');
-                var str='';
+        console.log("IS JSON!");
+        parse(data);
 
-                // var keys=data.keys();
-                // for(var i=0;i<keys.length;i++)
+        var size=rawString.length;
+        console.log('size',size,'characters');
 
-                str+=parseChild(data,str,0);
-            }
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(rawString));
+        element.setAttribute('download', filename);
+        element.innerText="download";
+        element.innerHTML="download";
 
-            document.getElementById("result").innerHTML=str;
-            console.log("done!");
+        document.body.appendChild(element);
 
-        }
+        return true;
     }
-);
+    catch(e)
+    {
+        return false;
+    }
+
+}
+
+document.addEventListener("DOMContentLoaded", start, false);
+
+
+
+
+
+
+
+
+
 
