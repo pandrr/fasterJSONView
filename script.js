@@ -55,7 +55,11 @@ function summary(str)
 function warning(str)
 {
     return '<span class="warning">'+str+'</span>'
-    
+}
+
+function childLink(title,id)
+{
+    return '<a class="childToggle" data-child="'+id+'">'+title+'</a>';
 }
 
 
@@ -64,6 +68,16 @@ const NUM='number';
 const OBJ='object';
 const MIXED='mixed';
 const BOOL='boolean';
+
+const MAX_ARRAY_TYPED=16;
+
+function toggleChilds(id)
+{
+    var ele=document.getElementById('childs'+id)
+    if(ele)ele.style.display = ele.style.display == "none" ? "block" : "none";
+}
+
+var childsIdCounter=0;
 
 
 function parseChild(data,str,level)
@@ -82,28 +96,15 @@ function parseChild(data,str,level)
 
     for(var i in data)
     {
+        childsIdCounter++;
+        const childsId=childsIdCounter;
         type=typeof data[i];
-
-        if(lastWasMultiLine && !rootIsArray) strAdd+=newLine;
-        lastWasMultiLine=false;
-
-        if(!rootIsArray) strAdd+=indent+title(i)+':&nbsp;';
-
-        if(type==NUM) strAdd+=value(data[i])+',';
-            else if(type==STR) strAdd+=value(stringSummary(data[i]))+',';
-            else if(type==BOOL) strAdd+=value(data[i])+',';
-
-        var contents='';
         var isArray=Array.isArray(data[i]);
 
+        var contents='';
 
         if(isArray)
         {
-            if(data[i].length==0)
-            {
-                strAdd+=value('[]')+','+newLine;
-                continue;
-            }
             contents=typeof data[i][0];
             for(var ai=0;ai<data[i].length;ai++)
             {
@@ -113,8 +114,32 @@ function parseChild(data,str,level)
                     break;
                 }
             }
+        }
 
-            if( (contents==NUM || contents==BOOL || contents==STR) && data[i].length<=16)
+
+
+        if(lastWasMultiLine && !rootIsArray) strAdd+=newLine;
+        lastWasMultiLine=false;
+
+
+        if(!rootIsArray)
+            if( (type==OBJ && !isArray) || (isArray && contents!=NUM && contents!=BOOL && contents!=STR && contents!='')) strAdd+=indent+title(childLink(i,childsId)+':&nbsp;');
+                else  strAdd+=indent+title(i)+':&nbsp;';
+        
+        if(type==NUM) strAdd+=value(data[i])+',';
+            else if(type==STR) strAdd+=value(stringSummary(data[i]))+',';
+            else if(type==BOOL) strAdd+=value(data[i])+',';
+
+
+        if(isArray)
+        {
+            if(data[i].length==0)
+            {
+                strAdd+=value('[]')+','+newLine;
+                continue;
+            }
+
+            if( (contents==NUM || contents==BOOL || contents==STR) && data[i].length<=MAX_ARRAY_TYPED)
             {
                 var arrStr='';
 
@@ -137,7 +162,7 @@ function parseChild(data,str,level)
         if(type==OBJ && (contents=='' || contents==OBJ))
         {
             if(isArray)strAdd+=indent+'['+newLine;
-                else strAdd+=indent+'{'+newLine;
+                else strAdd+=indent+childLink('{',childsId)+newLine;
 
             if(contents==OBJ && data[i].length>200)
             {
@@ -147,10 +172,12 @@ function parseChild(data,str,level)
             }
             else
             {
+                strAdd+='<div id="childs'+childsId+'">';
                 strAdd+=parseChild(data[i],'',level+1);
+                strAdd+='</div>';
             }
             if(isArray)strAdd+=indent+']';
-                else strAdd+=''+indent+'}';
+                else strAdd+=''+indent+childLink('}',childsId);
 
             strAdd+=',';
             lastWasMultiLine=true;
@@ -181,6 +208,19 @@ function parse(data)
     document.body.classList.add('fasterJSON');
 
     ele.innerHTML=str;
+
+    var anchors = document.getElementsByTagName('a');
+    for(var i=0;i<anchors.length;i++)
+    {
+        anchors[i].onclick=function(e)
+        {
+            if(e.toElement.dataset.child)toggleChilds(e.toElement.dataset.child);
+        }
+    }
+
+
+
+
     console.log("done!");
 }
 
@@ -200,13 +240,13 @@ function start()
         var size=rawString.length;
         console.log('size',size,'characters');
 
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(rawString));
-        element.setAttribute('download', filename);
-        element.innerText="download";
-        element.innerHTML="download";
+        // var element = document.createElement('a');
+        // element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(rawString));
+        // element.setAttribute('download', filename);
+        // element.innerText="download";
+        // element.innerHTML="download";
 
-        document.body.appendChild(element);
+        // document.body.appendChild(element);
 
         return true;
     }

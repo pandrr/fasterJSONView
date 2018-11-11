@@ -23,3 +23,9 @@ body.fasterJSON
 	color:#ec9213;
 	/*user-select: none;*/
 }
+
+.fasterJSON .childToggle
+{
+	cursor:pointer;
+	text-decoration: underline;
+}
