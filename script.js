@@ -168,9 +168,11 @@ function parseChild(data,str,level)
 function parse(data)
 {
     console.log('loaded');
-    var str='';
+    
 
-    str+=parseChild(data,str,0);
+    var str=parseChild(data,'',1);
+
+    str='{'+newLine+str+newLine+'}';
 
 
 
