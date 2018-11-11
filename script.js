@@ -116,11 +116,8 @@ function parseChild(data,str,level)
             }
         }
 
-
-
         if(lastWasMultiLine && !rootIsArray) strAdd+=newLine;
         lastWasMultiLine=false;
-
 
         if(!rootIsArray)
             if( (type==OBJ && !isArray) || (isArray && contents!=NUM && contents!=BOOL && contents!=STR && contents!='')) strAdd+=indent+title(childLink(i,childsId)+':&nbsp;');
@@ -172,7 +169,7 @@ function parseChild(data,str,level)
             }
             else
             {
-                strAdd+='<div id="childs'+childsId+'">';
+                strAdd+='<div id="childs'+childsId+'" class="childcontainer">';
                 strAdd+=parseChild(data[i],'',level+1);
                 strAdd+='</div>';
             }
@@ -194,14 +191,11 @@ function parseChild(data,str,level)
 
 function parse(data)
 {
-    console.log('loaded');
-    
+    console.log('fasterJSON started...');
 
     var str=parseChild(data,'',1);
 
-    str='{'+newLine+str+newLine+'}';
-
-
+    str='{'+newLine+str+'}'+newLine;
 
     var ele=document.createElement("div");
     document.body.appendChild(ele);
@@ -211,20 +205,13 @@ function parse(data)
 
     var anchors = document.getElementsByTagName('a');
     for(var i=0;i<anchors.length;i++)
-    {
         anchors[i].onclick=function(e)
         {
             if(e.toElement.dataset.child)toggleChilds(e.toElement.dataset.child);
         }
-    }
 
-
-
-
-    console.log("done!");
+    console.log("fasterJSON finished.");
 }
-
-
 
 function start()
 {
@@ -258,13 +245,6 @@ function start()
 }
 
 document.addEventListener("DOMContentLoaded", start, false);
-
-
-
-
-
-
-
 
 
 
