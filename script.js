@@ -27,7 +27,7 @@ function stringSummary(str)
         summary=summary.slice(0,MAX_CHARS_STRING)+' [...]';
     }
     var ret='"'+summary+'"';
-    if(meta.length>0)ret+=warning(meta);
+    if(meta.length>0)ret+=warning(' '+meta);
 
     return ret;
 }
